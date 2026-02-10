@@ -11,7 +11,7 @@ export const fetchTodos = async (): Promise<Todo[]> => {
   );
   if (!res.ok) throw new Error('Failed to fetch');
 
-  const response = await res.json();
+  const response = (await res.json()) as Todo[];
 
   console.log(response);
 
