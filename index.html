@@ -7,6 +7,29 @@
     <title>todo-list</title>
   </head>
   <body>
+    <script>
+      (function () {
+        try {
+          const storageKey = 'vite-ui-theme';
+          const theme = localStorage.getItem(storageKey);
+          const supportDarkMode =
+            window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+          if (!theme || theme === 'system') {
+            if (supportDarkMode) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            return;
+          }
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
