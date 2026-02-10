@@ -25,6 +25,7 @@ type PinListProps = {
     pinned?: string;
     unpinned?: string;
   };
+  onItemToggle?: (id: number) => void;
   transition?: Transition;
   labelMotionProps?: HTMLMotionProps<'p'>;
   className?: string;
@@ -37,6 +38,7 @@ type PinListProps = {
 function PinList({
   items,
   labels = { pinned: 'Pinned Items', unpinned: 'All Items' },
+  onItemToggle,
   transition = { stiffness: 320, damping: 20, mass: 0.8, type: 'spring' },
   labelMotionProps = {
     initial: { opacity: 0 },
@@ -51,30 +53,20 @@ function PinList({
   zIndexResetDelay = 500,
   ...props
 }: PinListProps) {
-  const [listItems, setListItems] = React.useState(items);
   const [togglingGroup, setTogglingGroup] = React.useState<
     'pinned' | 'unpinned' | null
   >(null);
 
-  const pinned = listItems.filter((u) => u.pinned);
-  const unpinned = listItems.filter((u) => !u.pinned);
+  const pinned = items.filter((u) => u.pinned);
+  const unpinned = items.filter((u) => !u.pinned);
 
   const toggleStatus = (id: number) => {
-    const item = listItems.find((u) => u.id === id);
+    const item = items.find((u) => u.id === id);
     if (!item) return;
 
+    onItemToggle?.(id);
+
     setTogglingGroup(item.pinned ? 'pinned' : 'unpinned');
-    setListItems((prev) => {
-      const idx = prev.findIndex((u) => u.id === id);
-      if (idx === -1) return prev;
-      const updated = [...prev];
-      const [item] = updated.splice(idx, 1);
-      if (!item) return prev;
-      const toggled = { ...item, pinned: !item.pinned };
-      if (toggled.pinned) updated.push(toggled);
-      else updated.unshift(toggled);
-      return updated;
-    });
     // Reset group z-index after the animation duration (keep in sync with animation timing)
     setTimeout(() => setTogglingGroup(null), zIndexResetDelay);
   };
@@ -83,6 +75,21 @@ function PinList({
     <motion.div className={cn('space-y-10', className)} {...props}>
       <LayoutGroup>
         <div>
+          <AnimatePresence>
+            {pinned.length > 0 && (
+              <motion.p
+                layout
+                key="pinned-label"
+                className={cn(
+                  'font-medium px-3 text-neutral-500 dark:text-neutral-300 text-sm mb-2',
+                  labelClassName
+                )}
+                {...labelMotionProps}
+              >
+                {labels.pinned}
+              </motion.p>
+            )}
+          </AnimatePresence>
           {pinned.length > 0 && (
             <div
               className={cn(
