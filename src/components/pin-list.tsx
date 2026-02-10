@@ -88,7 +88,7 @@ function PinList({
               className={cn(
                 'space-y-3 relative',
                 togglingGroup === 'pinned' ? 'z-5' : 'z-10',
-                pinnedSectionClassName,
+                pinnedSectionClassName
               )}
             >
               {pinned.map((item) => (
@@ -127,7 +127,7 @@ function PinList({
                 key="all-label"
                 className={cn(
                   'font-medium px-3 text-neutral-500 dark:text-neutral-300 text-sm mb-2',
-                  labelClassName,
+                  labelClassName
                 )}
                 {...labelMotionProps}
               >
@@ -140,7 +140,7 @@ function PinList({
               className={cn(
                 'space-y-3 relative',
                 togglingGroup === 'unpinned' ? 'z-5' : 'z-10',
-                unpinnedSectionClassName,
+                unpinnedSectionClassName
               )}
             >
               {unpinned.map((item) => (
