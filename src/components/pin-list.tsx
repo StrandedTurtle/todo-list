@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Pin } from 'lucide-react';
+import { Pin, Trash2 } from 'lucide-react';
 import {
   motion,
   LayoutGroup,
@@ -10,6 +10,18 @@ import {
   type Transition,
 } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button-variants';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 type PinListItem = {
   id: number;
@@ -26,6 +38,7 @@ type PinListProps = {
     unpinned?: string;
   };
   onItemToggle?: (id: number) => void;
+  onItemDelete?: (id: number) => void;
   transition?: Transition;
   labelMotionProps?: HTMLMotionProps<'p'>;
   className?: string;
@@ -39,6 +52,7 @@ function PinList({
   items,
   labels = { pinned: 'Pinned Items', unpinned: 'All Items' },
   onItemToggle,
+  onItemDelete,
   transition = { stiffness: 320, damping: 20, mass: 0.8, type: 'spring' },
   labelMotionProps = {
     initial: { opacity: 0 },
@@ -104,7 +118,7 @@ function PinList({
                   layoutId={`item-${item.id}`}
                   onClick={() => toggleStatus(item.id)}
                   transition={transition}
-                  className="flex items-center justify-between gap-5 rounded-2xl bg-neutral-200 dark:bg-neutral-800 p-2"
+                  className="flex items-center justify-between gap-5 rounded-2xl bg-neutral-200 dark:bg-neutral-800 p-2 group"
                 >
                   <div className="flex items-center gap-2">
                     <div className="rounded-lg bg-background p-2">
@@ -117,8 +131,16 @@ function PinList({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600">
-                    <Pin className="size-4 text-white fill-white" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600">
+                      <Pin className="size-4 text-white fill-white" />
+                    </div>
+                    {onItemDelete && (
+                      <DeleteItemControl
+                        item={item}
+                        onItemDelete={onItemDelete}
+                      />
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -169,8 +191,16 @@ function PinList({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity duration-250">
-                    <Pin className="size-4 text-white" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity duration-250">
+                      <Pin className="size-4 text-white" />
+                    </div>
+                    {onItemDelete && (
+                      <DeleteItemControl
+                        item={item}
+                        onItemDelete={onItemDelete}
+                      />
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -179,6 +209,47 @@ function PinList({
         </div>
       </LayoutGroup>
     </motion.div>
+  );
+}
+
+function DeleteItemControl({
+  item,
+  onItemDelete,
+}: {
+  item: PinListItem;
+  onItemDelete: (id: number) => void;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Delete ${item.name}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center justify-center size-8 rounded-full opacity-0 group-hover:opacity-100 text-neutral-500 dark:text-neutral-400 hover:bg-red-500/10 hover:text-red-600 dark:hover:bg-red-500/20 dark:hover:text-red-400 transition-opacity duration-250"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete "{item.name}"?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently remove this
+            task.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className={buttonVariants({ variant: 'destructive' })}
+            onClick={() => onItemDelete(item.id)}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

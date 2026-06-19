@@ -11,7 +11,7 @@ A React 19 task management app with animated pin/unpin interactions, filtering, 
 - **React 19** + TypeScript
 - **Vite** (dev server & bundler)
 - **Tailwind CSS v4** (styling)
-- **Shadcn UI** (Button, Input, Skeleton)
+- **Shadcn UI** (Button, Input, Skeleton, AlertDialog)
 - **Motion** (layout animations via PinList from Animate UI component library)
 - **Vitest** + React Testing Library (tests)
 
@@ -35,6 +35,7 @@ pnpm test   # Run all tests
 3. Tasks can be toggled between completed/incomplete by clicking the tasks.
 4. New tasks can be added via the input form at the top.
 5. Filter buttons let you view All, Completed, or Incomplete tasks.
+6. Tasks can be deleted by hovering over a task row and clicking the trash icon, then confirming in the dialog that appears.
 
 ## Things to add
 

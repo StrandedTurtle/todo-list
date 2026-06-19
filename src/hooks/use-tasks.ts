@@ -54,6 +54,10 @@ export function useTasks() {
     });
   }, []);
 
+  const deleteTask = useCallback((id: number) => {
+    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+  }, []);
+
   const addTask = useCallback((title: string) => {
     const newTask: Todo = {
       id: Date.now(),
@@ -81,6 +85,7 @@ export function useTasks() {
     filter,
     setFilter,
     toggleTask,
+    deleteTask,
     addTask,
     resetTasks,
     isLoading,

@@ -8,9 +8,16 @@ type TaskListProps = {
   isLoading: boolean;
   error: string | null;
   onToggle: (id: number) => void;
+  onDelete: (id: number) => void;
 };
 
-export function TaskList({ tasks, isLoading, error, onToggle }: TaskListProps) {
+export function TaskList({
+  tasks,
+  isLoading,
+  error,
+  onToggle,
+  onDelete,
+}: TaskListProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -51,6 +58,7 @@ export function TaskList({ tasks, isLoading, error, onToggle }: TaskListProps) {
       items={pinListItems}
       labels={{ pinned: 'Completed', unpinned: 'Incomplete' }}
       onItemToggle={onToggle}
+      onItemDelete={onDelete}
     />
   );
 }

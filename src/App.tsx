@@ -11,6 +11,7 @@ export default function App() {
     filter,
     setFilter,
     toggleTask,
+    deleteTask,
     addTask,
     resetTasks,
     isLoading,
@@ -35,8 +36,13 @@ export default function App() {
         isLoading={isLoading}
         error={error}
         onToggle={toggleTask}
+        onDelete={deleteTask}
       />
-      <p className="opacity-50">This web app works by using local storage, so you can close the site and come back and your tasks will remain as long as you dont clear your browser cache. There is no syncing to a server of any kind.</p>
+      <p className="opacity-50">
+        This web app works by using local storage, so you can close the site and
+        come back and your tasks will remain as long as you dont clear your
+        browser cache. There is no syncing to a server of any kind.
+      </p>
     </div>
   );
 }

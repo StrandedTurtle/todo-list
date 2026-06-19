@@ -24,6 +24,21 @@ globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
+// jsdom doesn't implement these; Radix's AlertDialog calls them internally
+// for pointer-capture and focus-scroll handling during open/close.
+if (!Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = vi.fn(() => false);
+}
+if (!Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = vi.fn();
+}
+if (!Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = vi.fn();
+}
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = vi.fn();
+}
+
 describe('Todo App', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -79,5 +94,60 @@ describe('Todo App', () => {
     await user.click(screen.getByRole('button', { name: 'Incomplete' }));
     expect(screen.getByText('Active Task')).toBeInTheDocument();
     expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
+  });
+
+  it('deletes a task after confirming in the alert dialog', async () => {
+    const savedTasks = [
+      { id: 1, title: 'Buy milk', completed: false, userId: 1 },
+    ];
+    localStorage.setItem('task-board-tasks', JSON.stringify(savedTasks));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByText('Buy milk')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /delete buy milk/i }));
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    expect(screen.queryByText('Buy milk')).not.toBeInTheDocument();
+  });
+
+  it('keeps the task when canceling the delete confirmation', async () => {
+    const savedTasks = [
+      { id: 1, title: 'Buy milk', completed: false, userId: 1 },
+    ];
+    localStorage.setItem('task-board-tasks', JSON.stringify(savedTasks));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /delete buy milk/i }));
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Buy milk')).toBeInTheDocument();
+  });
+
+  it('does not toggle task completion when opening or canceling the delete dialog', async () => {
+    const savedTasks = [
+      { id: 1, title: 'Buy milk', completed: false, userId: 1 },
+    ];
+    localStorage.setItem('task-board-tasks', JSON.stringify(savedTasks));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /delete buy milk/i }));
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    // "Completed" only appears as the filter button when no task is completed;
+    // a toggle bug would add the section label + the task's status text too.
+    expect(screen.getAllByText('Completed')).toHaveLength(1);
+    expect(screen.getByText('Buy milk')).toBeInTheDocument();
   });
 });
