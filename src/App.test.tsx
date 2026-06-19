@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'; // Fixes "toBeInTheDocument" error
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import App from './App';
@@ -89,11 +89,16 @@ describe('Todo App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Completed' }));
     expect(screen.getByText('Completed Task')).toBeInTheDocument();
-    expect(screen.queryByText('Active Task')).not.toBeInTheDocument();
+    // Active Task exits with an animation, so it lingers in the DOM briefly.
+    await waitFor(() =>
+      expect(screen.queryByText('Active Task')).not.toBeInTheDocument()
+    );
 
     await user.click(screen.getByRole('button', { name: 'Incomplete' }));
     expect(screen.getByText('Active Task')).toBeInTheDocument();
-    expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Completed Task')).not.toBeInTheDocument()
+    );
   });
 
   it('deletes a task after confirming in the alert dialog', async () => {

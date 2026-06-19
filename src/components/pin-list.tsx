@@ -88,67 +88,7 @@ function PinList({
   return (
     <motion.div className={cn('space-y-10', className)} {...props}>
       <LayoutGroup>
-        <div>
-          <AnimatePresence>
-            {pinned.length > 0 && (
-              <motion.p
-                layout
-                key="pinned-label"
-                className={cn(
-                  'font-medium px-3 text-neutral-500 dark:text-neutral-300 text-sm mb-2',
-                  labelClassName
-                )}
-                {...labelMotionProps}
-              >
-                {labels.pinned}
-              </motion.p>
-            )}
-          </AnimatePresence>
-          {pinned.length > 0 && (
-            <div
-              className={cn(
-                'space-y-3 relative',
-                togglingGroup === 'pinned' ? 'z-5' : 'z-10',
-                pinnedSectionClassName
-              )}
-            >
-              {pinned.map((item) => (
-                <motion.div
-                  key={item.id}
-                  layoutId={`item-${item.id}`}
-                  onClick={() => toggleStatus(item.id)}
-                  transition={transition}
-                  className="flex items-center justify-between gap-5 rounded-2xl bg-neutral-200 dark:bg-neutral-800 p-2 group"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="rounded-lg bg-background p-2">
-                      <item.icon className="size-5 text-neutral-500 dark:text-neutral-400" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">{item.name}</div>
-                      <div className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-                        {item.info}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600">
-                      <Pin className="size-4 text-white fill-white" />
-                    </div>
-                    {onItemDelete && (
-                      <DeleteItemControl
-                        item={item}
-                        onItemDelete={onItemDelete}
-                      />
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
+        <motion.div layout>
           <AnimatePresence>
             {unpinned.length > 0 && (
               <motion.p
@@ -164,20 +104,28 @@ function PinList({
               </motion.p>
             )}
           </AnimatePresence>
-          {unpinned.length > 0 && (
-            <div
-              className={cn(
-                'space-y-3 relative',
-                togglingGroup === 'unpinned' ? 'z-5' : 'z-10',
-                unpinnedSectionClassName
-              )}
-            >
+          <motion.div
+            layout
+            className={cn(
+              'space-y-3 relative',
+              togglingGroup === 'unpinned' ? 'z-5' : 'z-10',
+              unpinnedSectionClassName
+            )}
+          >
+            <AnimatePresence mode="popLayout">
               {unpinned.map((item) => (
                 <motion.div
                   key={item.id}
                   layoutId={`item-${item.id}`}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
                   onClick={() => toggleStatus(item.id)}
-                  transition={transition}
+                  transition={{
+                    layout: transition,
+                    opacity: { duration: 0.18, ease: 'easeOut' },
+                    scale: { duration: 0.18, ease: 'easeOut' },
+                  }}
                   className="flex items-center justify-between gap-5 rounded-2xl bg-neutral-200 dark:bg-neutral-800 p-2 group"
                 >
                   <div className="flex items-center gap-2">
@@ -192,21 +140,89 @@ function PinList({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity duration-250">
-                      <Pin className="size-4 text-white" />
-                    </div>
                     {onItemDelete && (
                       <DeleteItemControl
                         item={item}
                         onItemDelete={onItemDelete}
                       />
                     )}
+                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity duration-250">
+                      <Pin className="size-4 text-white" />
+                    </div>
                   </div>
                 </motion.div>
               ))}
-            </div>
-          )}
-        </div>
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+
+        <motion.div layout>
+          <AnimatePresence>
+            {pinned.length > 0 && (
+              <motion.p
+                layout
+                key="pinned-label"
+                className={cn(
+                  'font-medium px-3 text-neutral-500 dark:text-neutral-300 text-sm mb-2',
+                  labelClassName
+                )}
+                {...labelMotionProps}
+              >
+                {labels.pinned}
+              </motion.p>
+            )}
+          </AnimatePresence>
+          <motion.div
+            layout
+            className={cn(
+              'space-y-3 relative',
+              togglingGroup === 'pinned' ? 'z-5' : 'z-10',
+              pinnedSectionClassName
+            )}
+          >
+            <AnimatePresence mode="popLayout">
+              {pinned.map((item) => (
+                <motion.div
+                  key={item.id}
+                  layoutId={`item-${item.id}`}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  onClick={() => toggleStatus(item.id)}
+                  transition={{
+                    layout: transition,
+                    opacity: { duration: 0.18, ease: 'easeOut' },
+                    scale: { duration: 0.18, ease: 'easeOut' },
+                  }}
+                  className="flex items-center justify-between gap-5 rounded-2xl bg-neutral-200 dark:bg-neutral-800 p-2 group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-lg bg-background p-2">
+                      <item.icon className="size-5 text-neutral-500 dark:text-neutral-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">{item.name}</div>
+                      <div className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                        {item.info}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {onItemDelete && (
+                      <DeleteItemControl
+                        item={item}
+                        onItemDelete={onItemDelete}
+                      />
+                    )}
+                    <div className="flex items-center justify-center size-8 rounded-full bg-neutral-400 dark:bg-neutral-600">
+                      <Pin className="size-4 text-white fill-white" />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
       </LayoutGroup>
     </motion.div>
   );
